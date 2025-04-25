@@ -153,17 +153,15 @@ public static class SkillsMenu
 
         foreach (REPOSlider slider in _skillSliders)
         {
-            if (slider.labelTMP.text == "Map Player Count")
+            int limit = slider.labelTMP.text == "Map Player Count" ? 1 : int.MaxValue;
+            
+            if (slider == _skillSliders[index])
             {
-                slider.max = Math.Min(slider.value + availableSkillPoints, 1);
-            }
-            else if (slider == _skillSliders[index])
-            {
-                slider.max = Mathf.Min(value + availableSkillPoints, int.MaxValue);
+                slider.max = Mathf.Min(value + availableSkillPoints, limit);
             }
             else
             {
-                slider.max = Mathf.Min(slider.value + availableSkillPoints, int.MaxValue);
+                slider.max = Mathf.Min(slider.value + availableSkillPoints, limit);
             }
 
             slider.SetValue(slider.value, false);
