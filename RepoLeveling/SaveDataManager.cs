@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using BepInEx.Configuration;
+using Photon.Pun;
 using UnityEngine;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
@@ -84,54 +85,54 @@ internal static class SaveDataManager
     }
 
     private static void ApplyUpgrade(
-        Dictionary<string, int> upgradeDict, 
-        ConfigEntry<int> savedValue, 
-        Func<string, int> upgradeAction)
+        Dictionary<string, int> upgradeDict,
+        ConfigEntry<int> savedValue,
+        Action<string> upgradeAction,
+        string rpcName)
     {
-        if (!upgradeDict.ContainsKey(PlayerController.instance.playerSteamID))
-        {
-            upgradeDict[PlayerController.instance.playerSteamID] = 0;
-        }
+        upgradeDict.TryAdd(PlayerController.instance.playerSteamID, 0);
 
-        for (int i = upgradeDict[PlayerController.instance.playerSteamID];
-             i < savedValue.Value;
-             i++)
+        while (upgradeDict[PlayerController.instance.playerSteamID] < savedValue.Value)
         {
+            ++upgradeDict[PlayerController.instance.playerSteamID];
             upgradeAction(PlayerController.instance.playerSteamID);
+            if (SemiFunc.IsMultiplayer())
+                PunManager.instance.photonView.RPC(rpcName, RpcTarget.Others, PlayerController.instance.playerSteamID,
+                    upgradeDict[PlayerController.instance.playerSteamID]);
         }
     }
 
     internal static void ApplySkills()
     {
         RepoLeveling.Logger.LogDebug("Applying skill points...");
-        
-        ApplyUpgrade(StatsManager.instance.playerUpgradeMapPlayerCount, SaveMapPlayerCount, 
-            PunManager.instance.UpgradeMapPlayerCount);
-        
-        ApplyUpgrade(StatsManager.instance.playerUpgradeStamina, SaveEnergy, 
-            PunManager.instance.UpgradePlayerEnergy);
-        
-        ApplyUpgrade(StatsManager.instance.playerUpgradeExtraJump, SaveExtraJump, 
-            PunManager.instance.UpgradePlayerExtraJump);
-        
-        ApplyUpgrade(StatsManager.instance.playerUpgradeRange, SaveGrabRange, 
-            PunManager.instance.UpgradePlayerGrabRange);
-        
-        ApplyUpgrade(StatsManager.instance.playerUpgradeStrength, SaveGrabStrength, 
-            PunManager.instance.UpgradePlayerGrabStrength);
-        
-        ApplyUpgrade(StatsManager.instance.playerUpgradeThrow, SaveGrabThrow, 
-            PunManager.instance.UpgradePlayerThrowStrength);
-        
-        ApplyUpgrade(StatsManager.instance.playerUpgradeHealth, SaveHealth, 
-            PunManager.instance.UpgradePlayerHealth);
-        
-        ApplyUpgrade(StatsManager.instance.playerUpgradeSpeed, SaveSprintSpeed, 
-            PunManager.instance.UpgradePlayerSprintSpeed);
-        
-        ApplyUpgrade(StatsManager.instance.playerUpgradeLaunch, SaveTumbleLaunch, 
-            PunManager.instance.UpgradePlayerTumbleLaunch);
-        
+
+        ApplyUpgrade(StatsManager.instance.playerUpgradeMapPlayerCount, SaveMapPlayerCount,
+            PunManager.instance.UpdateMapPlayerCountRightAway, "UpgradeMapPlayerCountRPC");
+
+        ApplyUpgrade(StatsManager.instance.playerUpgradeStamina, SaveEnergy,
+            PunManager.instance.UpdateEnergyRightAway, "UpgradePlayerEnergyRPC");
+
+        ApplyUpgrade(StatsManager.instance.playerUpgradeExtraJump, SaveExtraJump,
+            PunManager.instance.UpdateExtraJumpRightAway, "UpgradePlayerExtraJumpRPC");
+
+        ApplyUpgrade(StatsManager.instance.playerUpgradeRange, SaveGrabRange,
+            PunManager.instance.UpdateGrabRangeRightAway, "UpgradePlayerGrabRangeRPC");
+
+        ApplyUpgrade(StatsManager.instance.playerUpgradeStrength, SaveGrabStrength,
+            PunManager.instance.UpdateGrabStrengthRightAway, "UpgradePlayerGrabStrengthRPC");
+
+        ApplyUpgrade(StatsManager.instance.playerUpgradeThrow, SaveGrabThrow,
+            PunManager.instance.UpdateThrowStrengthRightAway, "UpgradePlayerThrowStrengthRPC");
+
+        ApplyUpgrade(StatsManager.instance.playerUpgradeHealth, SaveHealth,
+            PunManager.instance.UpdateHealthRightAway, "UpgradePlayerHealthRPC");
+
+        ApplyUpgrade(StatsManager.instance.playerUpgradeSpeed, SaveSprintSpeed,
+            PunManager.instance.UpdateSprintSpeedRightAway, "UpgradePlayerSprintSpeedRPC");
+
+        ApplyUpgrade(StatsManager.instance.playerUpgradeLaunch, SaveTumbleLaunch,
+            PunManager.instance.UpdateTumbleLaunchRightAway, "UpgradePlayerTumbleLaunchRPC");
+
         RepoLeveling.Logger.LogDebug("Skill points applied.");
     }
 
