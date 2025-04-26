@@ -35,18 +35,21 @@ public static class SkillsMenu
         REPOElement[] elements =
         {
             MenuAPI.CreateREPOLabel("Total Hauled:", statisticsPage.transform, new Vector2(70, 270)),
-            MenuAPI.CreateREPOLabel("Total SP earned:", statisticsPage.transform, new Vector2(70, 240)),
-            MenuAPI.CreateREPOLabel("Available SP:", statisticsPage.transform, new Vector2(70, 210)),
-            MenuAPI.CreateREPOLabel("Next SP in:", statisticsPage.transform, new Vector2(70, 180)),
-
+            MenuAPI.CreateREPOLabel("Next SP in:", statisticsPage.transform, new Vector2(70, 240)),
+            MenuAPI.CreateREPOLabel("Total SP earned:", statisticsPage.transform, new Vector2(70, 210)),
+            MenuAPI.CreateREPOLabel("Available SP:", statisticsPage.transform, new Vector2(70, 180)),
+            MenuAPI.CreateREPOLabel("Current Haul:", statisticsPage.transform, new Vector2(70, 150)),
+            
             MenuAPI.CreateREPOLabel($"{SaveDataManager.SaveCumulativeHaul.Value}k", statisticsPage.transform,
                 new Vector2(260, 270)),
-            MenuAPI.CreateREPOLabel($"{SaveDataManager.SkillPointsFromCumulativeHaul()}", statisticsPage.transform,
-                new Vector2(260, 240)),
-            _availableSkillPoints = MenuAPI.CreateREPOLabel($"{SaveDataManager.AvailableSkillPoints()}",
-                statisticsPage.transform, new Vector2(260, 210)),
             MenuAPI.CreateREPOLabel($"{SaveDataManager.NeededCumulativeHaulForNextSkillPoint()}k", statisticsPage.transform,
-                new Vector2(260, 180)),
+                new Vector2(260, 240)),
+            MenuAPI.CreateREPOLabel($"{SaveDataManager.SkillPointsFromCumulativeHaul()}", statisticsPage.transform,
+                new Vector2(260, 210)),
+            _availableSkillPoints = MenuAPI.CreateREPOLabel($"{SaveDataManager.AvailableSkillPoints()}",
+                statisticsPage.transform, new Vector2(260, 180)),
+            MenuAPI.CreateREPOLabel($"{StatsManager.instance.GetRunStatTotalHaul()}k", statisticsPage.transform,
+                new Vector2(260, 150)),
 
             MenuAPI.CreateREPOLabel("Note: SP = Skill Points", statisticsPage.transform, new Vector2(70, 60)),
             MenuAPI.CreateREPOButton("Reset progress", () => MenuAPI.OpenPopup("Reset Progress", Color.red,
