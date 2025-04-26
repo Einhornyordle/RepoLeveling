@@ -10,6 +10,7 @@ public class RepoLeveling : BaseUnityPlugin
 {
     private static RepoLeveling Instance { get; set; } = null!;
     internal new static ManualLogSource Logger => Instance._logger;
+
     // ReSharper disable once InconsistentNaming
     private ManualLogSource _logger => base.Logger;
     private Harmony? Harmony { get; set; }

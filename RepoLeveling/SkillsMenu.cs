@@ -39,10 +39,11 @@ public static class SkillsMenu
             MenuAPI.CreateREPOLabel("Total SP earned:", statisticsPage.transform, new Vector2(70, 210)),
             MenuAPI.CreateREPOLabel("Available SP:", statisticsPage.transform, new Vector2(70, 180)),
             MenuAPI.CreateREPOLabel("Current Haul:", statisticsPage.transform, new Vector2(70, 150)),
-            
+
             MenuAPI.CreateREPOLabel($"{SaveDataManager.SaveCumulativeHaul.Value}k", statisticsPage.transform,
                 new Vector2(260, 270)),
-            MenuAPI.CreateREPOLabel($"{SaveDataManager.NeededCumulativeHaulForNextSkillPoint()}k", statisticsPage.transform,
+            MenuAPI.CreateREPOLabel($"{SaveDataManager.NeededCumulativeHaulForNextSkillPoint()}k",
+                statisticsPage.transform,
                 new Vector2(260, 240)),
             MenuAPI.CreateREPOLabel($"{SaveDataManager.SkillPointsFromCumulativeHaul()}", statisticsPage.transform,
                 new Vector2(260, 210)),
@@ -157,7 +158,7 @@ public static class SkillsMenu
         foreach (REPOSlider slider in _skillSliders)
         {
             int limit = slider.labelTMP.text == "Map Player Count" ? 1 : int.MaxValue;
-            
+
             if (slider == _skillSliders[index])
             {
                 slider.max = Mathf.Min(value + availableSkillPoints, limit);
