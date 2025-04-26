@@ -3,7 +3,7 @@ Tired of starting from scratch every time you get a game over in R.E.P.O.? What 
 victory? Introducing Repo Leveling, a mod designed to transform R.E.P.O. from a rogue-like into a rogue-lite, providing
 a sense of progression that keeps you coming back for more!
 
-## Features:
+## Features
 - **Total Haul Value:** Track the cumulative value of all items extracted during successful runs, turning every game
   over into a stepping stone for future success.
 - **Skill Points (SP):** Skill Points are earned based on your Total Haul Value. Spend them to unlock permanent skills
@@ -14,6 +14,6 @@ a sense of progression that keeps you coming back for more!
 - **Skill Menu:** Your main hub for managing skills, featuring a statistics overview on the left and a skill point
   distribution section on the right. Access it easily via a new Skills button in the main menu and multiplayer lobby.
 
-## Images:
+## Images
 
 ![A picture of the Skill Menu](https://raw.githubusercontent.com/Einhornyordle/RepoLeveling/refs/heads/main/images/SkillMenu.png "This is how the Skill Menu looks in-game!")
