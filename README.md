@@ -28,5 +28,5 @@ the [Issue Tracker on GitHub](https://github.com/Einhornyordle/RepoLeveling/issu
 - For discussions, questions and more, please
 use [GitHub Discussions](https://github.com/Einhornyordle/RepoLeveling/discussions).
 - If you can't or really don't want to use GitHub, join the R.E.P.O. Modding Discord server using the link in the
-navigation bar above and send a message in my post in #released-mods. Feel free to ping me (@einhornyordle) there since
+navigation bar above and send a message [in my post in #released-mods](https://discord.com/channels/1344557689979670578/1366129264214147102). Feel free to ping me (@einhornyordle) there since
 I do not actively monitor the post-thread, and it might take me a while to respond otherwise.
