@@ -21,6 +21,10 @@ a sense of progression that keeps you coming back for more!
 ![A picture of the Skill Menu](https://raw.githubusercontent.com/Einhornyordle/RepoLeveling/refs/heads/main/images/SkillMenu.png "This is how the Skill Menu looks in-game")
 This is how the Skill Menu looks in-game.
 
+## Documentation
+
+More detailed documentation can be found via the [GitHub Wiki](https://github.com/Einhornyordle/RepoLeveling/wiki).
+
 ## Support
 
 - For bug reports and feature requests, please use
