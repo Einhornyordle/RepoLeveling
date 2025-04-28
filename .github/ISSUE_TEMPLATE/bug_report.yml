@@ -10,7 +10,7 @@ body:
     attributes:
       label: Version
       description: "Which version of the mod did you use when you encountered the bug?"
-      placeholder: "0.1.0"
+      placeholder: "v0.1.2"
     validations:
       required: true
   - type: textarea
