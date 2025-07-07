@@ -1,3 +1,7 @@
+# v0.1.3
+- Added compatibility with "R.E.P.O. v0.2.0 - The Museum Update"
+  - Added Crouch Rest Skill
+  - Added Tumble Wings Skill
 # v0.1.2
 - Readme
   - Now features a discord link to the relevant post in the released-mods channel of the R.E.P.O. Modding Discord server
