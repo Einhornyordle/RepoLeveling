@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using BepInEx.Configuration;
-using Photon.Pun;
 using UnityEngine;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
@@ -14,6 +13,7 @@ internal static class SaveDataManager
     internal static ConfigEntry<int> SaveCumulativeHaul;
 
     internal static ConfigEntry<int> SaveMapPlayerCount;
+    internal static ConfigEntry<int> SaveCrouchRest;
     internal static ConfigEntry<int> SaveEnergy;
     internal static ConfigEntry<int> SaveExtraJump;
     internal static ConfigEntry<int> SaveGrabRange;
@@ -22,6 +22,7 @@ internal static class SaveDataManager
     internal static ConfigEntry<int> SaveHealth;
     internal static ConfigEntry<int> SaveSprintSpeed;
     internal static ConfigEntry<int> SaveTumbleLaunch;
+    internal static ConfigEntry<int> SaveTumbleWings;
 
     internal static void Initialize()
     {
@@ -36,6 +37,10 @@ internal static class SaveDataManager
         SaveMapPlayerCount = save.Bind("Skills", "MapPlayerCount", 0,
             new ConfigDescription(
                 "The amount of map player count upgrades you've skilled. Set to 0 to regain spent skill points.",
+                new AcceptableValueRange<int>(0, int.MaxValue)));
+        SaveCrouchRest = save.Bind("Skills", "CrouchRest", 0,
+            new ConfigDescription(
+                "The amount of crouch rest upgrades you've skilled. Set to 0 to regain spent skill points.",
                 new AcceptableValueRange<int>(0, int.MaxValue)));
         SaveEnergy = save.Bind("Skills", "Energy", 0,
             new ConfigDescription(
@@ -67,12 +72,17 @@ internal static class SaveDataManager
             new ConfigDescription(
                 "The amount of tumble launch upgrades you've skilled. Set to 0 to regain spent skill points.",
                 new AcceptableValueRange<int>(0, int.MaxValue)));
+        SaveTumbleWings = save.Bind("Skills", "TumbleWings", 0,
+            new ConfigDescription(
+                "The amount of tumble wings upgrades you've skilled. Set to 0 to regain spent skill points.",
+                new AcceptableValueRange<int>(0, int.MaxValue)));
     }
 
     internal static void ResetProgress()
     {
         SaveCumulativeHaul.Value = 0;
         SaveMapPlayerCount.Value = 0;
+        SaveCrouchRest.Value = 0;
         SaveEnergy.Value = 0;
         SaveExtraJump.Value = 0;
         SaveGrabRange.Value = 0;
@@ -81,24 +91,21 @@ internal static class SaveDataManager
         SaveHealth.Value = 0;
         SaveSprintSpeed.Value = 0;
         SaveTumbleLaunch.Value = 0;
+        SaveTumbleWings.Value = 0;
         RepoLeveling.Logger.LogDebug("Progress reset.");
     }
 
     private static void ApplyUpgrade(
         Dictionary<string, int> upgradeDict,
         ConfigEntry<int> savedValue,
-        Action<string> upgradeAction,
-        string rpcName)
+        Func<string, int> upgradeFunc)
     {
         upgradeDict.TryAdd(PlayerController.instance.playerSteamID, 0);
 
         while (upgradeDict[PlayerController.instance.playerSteamID] < savedValue.Value)
         {
             ++upgradeDict[PlayerController.instance.playerSteamID];
-            upgradeAction(PlayerController.instance.playerSteamID);
-            if (SemiFunc.IsMultiplayer())
-                PunManager.instance.photonView.RPC(rpcName, RpcTarget.Others, PlayerController.instance.playerSteamID,
-                    upgradeDict[PlayerController.instance.playerSteamID]);
+            upgradeFunc(PlayerController.instance.playerSteamID);
         }
     }
 
@@ -107,31 +114,37 @@ internal static class SaveDataManager
         RepoLeveling.Logger.LogDebug("Applying skill points...");
 
         ApplyUpgrade(StatsManager.instance.playerUpgradeMapPlayerCount, SaveMapPlayerCount,
-            PunManager.instance.UpdateMapPlayerCountRightAway, "UpgradeMapPlayerCountRPC");
+            PunManager.instance.UpgradeMapPlayerCount);
+
+        ApplyUpgrade(StatsManager.instance.playerUpgradeCrouchRest, SaveCrouchRest,
+            PunManager.instance.UpgradePlayerCrouchRest);
 
         ApplyUpgrade(StatsManager.instance.playerUpgradeStamina, SaveEnergy,
-            PunManager.instance.UpdateEnergyRightAway, "UpgradePlayerEnergyRPC");
+            PunManager.instance.UpgradePlayerEnergy);
 
         ApplyUpgrade(StatsManager.instance.playerUpgradeExtraJump, SaveExtraJump,
-            PunManager.instance.UpdateExtraJumpRightAway, "UpgradePlayerExtraJumpRPC");
+            PunManager.instance.UpgradePlayerExtraJump);
 
         ApplyUpgrade(StatsManager.instance.playerUpgradeRange, SaveGrabRange,
-            PunManager.instance.UpdateGrabRangeRightAway, "UpgradePlayerGrabRangeRPC");
+            PunManager.instance.UpgradePlayerGrabRange);
 
         ApplyUpgrade(StatsManager.instance.playerUpgradeStrength, SaveGrabStrength,
-            PunManager.instance.UpdateGrabStrengthRightAway, "UpgradePlayerGrabStrengthRPC");
+            PunManager.instance.UpgradePlayerGrabStrength);
 
         ApplyUpgrade(StatsManager.instance.playerUpgradeThrow, SaveGrabThrow,
-            PunManager.instance.UpdateThrowStrengthRightAway, "UpgradePlayerThrowStrengthRPC");
+            PunManager.instance.UpgradePlayerThrowStrength);
 
         ApplyUpgrade(StatsManager.instance.playerUpgradeHealth, SaveHealth,
-            PunManager.instance.UpdateHealthRightAway, "UpgradePlayerHealthRPC");
+            PunManager.instance.UpgradePlayerHealth);
 
         ApplyUpgrade(StatsManager.instance.playerUpgradeSpeed, SaveSprintSpeed,
-            PunManager.instance.UpdateSprintSpeedRightAway, "UpgradePlayerSprintSpeedRPC");
+            PunManager.instance.UpgradePlayerSprintSpeed);
 
         ApplyUpgrade(StatsManager.instance.playerUpgradeLaunch, SaveTumbleLaunch,
-            PunManager.instance.UpdateTumbleLaunchRightAway, "UpgradePlayerTumbleLaunchRPC");
+            PunManager.instance.UpgradePlayerTumbleLaunch);
+
+        ApplyUpgrade(StatsManager.instance.playerUpgradeTumbleWings, SaveTumbleWings,
+            PunManager.instance.UpgradePlayerTumbleWings);
 
         RepoLeveling.Logger.LogDebug("Skill points applied.");
     }
@@ -153,9 +166,9 @@ internal static class SaveDataManager
     /// <returns>The number of skill points spent across all available skills.</returns>
     private static int TotalSpentSkillPoints()
     {
-        int spentSkillPoints = SaveMapPlayerCount.Value + SaveEnergy.Value + SaveExtraJump.Value + SaveGrabRange.Value +
+        int spentSkillPoints = SaveMapPlayerCount.Value + SaveCrouchRest.Value + SaveEnergy.Value + SaveExtraJump.Value + SaveGrabRange.Value +
                                SaveGrabStrength.Value + SaveGrabThrow.Value + SaveHealth.Value + SaveSprintSpeed.Value +
-                               SaveTumbleLaunch.Value;
+                               SaveTumbleLaunch.Value + SaveTumbleWings.Value;
         RepoLeveling.Logger.LogDebug($"Spent skill points: {spentSkillPoints}");
         return spentSkillPoints;
     }
