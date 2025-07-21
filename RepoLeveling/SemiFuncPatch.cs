@@ -20,8 +20,8 @@ internal static class SemiFuncPatch
     [HarmonyPostfix, HarmonyPatch(nameof(SemiFunc.OnSceneSwitch))]
     private static void OnSceneSwitch_Postfix()
     {
-        if (!SemiFunc.IsMasterClientOrSingleplayer() || !SemiFunc.RunIsLevel() || StatsManager.instance
-                .FetchPlayerUpgrades(PlayerController.instance.playerSteamID).Values.Any(val => val != 0))
+        if (!SemiFunc.RunIsLevel() || StatsManager.instance.FetchPlayerUpgrades(PlayerController.instance.playerSteamID)
+                .Values.Any(val => val > 0))
             return;
         SaveDataManager.ApplySkills();
     }
