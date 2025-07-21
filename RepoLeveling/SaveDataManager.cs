@@ -104,7 +104,6 @@ public static class SaveDataManager
 
         while (upgradeDict[PlayerController.instance.playerSteamID] < savedValue.Value)
         {
-            ++upgradeDict[PlayerController.instance.playerSteamID];
             upgradeFunc(PlayerController.instance.playerSteamID);
         }
     }
