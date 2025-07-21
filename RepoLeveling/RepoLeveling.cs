@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace RepoLeveling;
 
-[BepInPlugin("Einhornyordle.RepoLeveling", "RepoLeveling", "0.1.3")]
+[BepInPlugin("Einhornyordle.RepoLeveling", "RepoLeveling", "0.1.4")]
 public class RepoLeveling : BaseUnityPlugin
 {
     public static RepoLeveling Instance { get; set; } = null!;
