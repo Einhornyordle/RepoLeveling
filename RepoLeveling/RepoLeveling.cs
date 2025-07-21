@@ -8,7 +8,7 @@ namespace RepoLeveling;
 [BepInPlugin("Einhornyordle.RepoLeveling", "RepoLeveling", "0.1.3")]
 public class RepoLeveling : BaseUnityPlugin
 {
-    private static RepoLeveling Instance { get; set; } = null!;
+    public static RepoLeveling Instance { get; set; } = null!;
     internal new static ManualLogSource Logger => Instance._logger;
 
     // ReSharper disable once InconsistentNaming
