@@ -34,7 +34,7 @@
     <!-- External References -->
     <ItemGroup>
         <Reference Include="MenuLib" Private="false">
-            <HintPath>A:\Code\Repo\MenuLib\MenuLib.dll</HintPath>
+            <HintPath>$(BepInExDirectory)\plugins\nickklmao-MenuLib\MenuLib.dll</HintPath>
         </Reference>
     </ItemGroup>
 </Project>
