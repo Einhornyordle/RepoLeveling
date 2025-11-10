@@ -98,14 +98,12 @@ public static class SaveDataManager
     private static void ApplyUpgrade(
         Dictionary<string, int> upgradeDict,
         ConfigEntry<int> savedValue,
-        Func<string, int> upgradeFunc)
+        Func<string, int, int> upgradeFunc)
     {
         upgradeDict.TryAdd(PlayerController.instance.playerSteamID, 0);
 
-        while (upgradeDict[PlayerController.instance.playerSteamID] < savedValue.Value)
-        {
-            upgradeFunc(PlayerController.instance.playerSteamID);
-        }
+        upgradeFunc(PlayerController.instance.playerSteamID, savedValue.Value);
+ 
     }
 
     public static void ApplySkills()
