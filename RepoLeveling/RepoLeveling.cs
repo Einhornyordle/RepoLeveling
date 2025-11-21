@@ -25,6 +25,7 @@ public class RepoLeveling : BaseUnityPlugin
 
         Patch();
 
+        ConfigManager.Initialize();
         SaveDataManager.Initialize();
         SkillsMenu.Initialize();
 

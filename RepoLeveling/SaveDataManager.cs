@@ -174,7 +174,8 @@ public static class SaveDataManager
     /// <returns>The total available skill points.</returns>
     public static int SkillPointsFromCumulativeHaul()
     {
-        int skillPoints = (int)((-1 + Math.Sqrt(1 + 4 * SaveCumulativeHaul.Value / 75.0)) / 2);
+        int skillPoints = (int)Math.Round((-1 + Math.Sqrt(1 + 4 * SaveCumulativeHaul.Value /
+            (75.0f * ConfigManager.TotalHaulRequirementMultiplier.Value))) / 2);
         RepoLeveling.Logger.LogDebug($"Total skill points: {skillPoints}");
         return skillPoints;
     }
@@ -212,7 +213,8 @@ public static class SaveDataManager
     public static int TotalCumulativeHaulNeededForNextSkillPoint()
     {
         int nextSkillPoint = SkillPointsFromCumulativeHaul() + 1;
-        int neededHaul = 75 * nextSkillPoint * (nextSkillPoint + 1);
+        int neededHaul = (int)Math.Round(75 * nextSkillPoint * (nextSkillPoint + 1) *
+                                         ConfigManager.TotalHaulRequirementMultiplier.Value);
         RepoLeveling.Logger.LogDebug($"Total haul needed for next skill point: {neededHaul}");
         return neededHaul;
     }
