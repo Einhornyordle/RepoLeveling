@@ -12,6 +12,7 @@ public static class SaveDataManager
 {
     public static ConfigEntry<int> SaveCumulativeHaul;
 
+    public static ConfigEntry<int> SaveDeathHeadBattery;
     public static ConfigEntry<int> SaveMapPlayerCount;
     public static ConfigEntry<int> SaveCrouchRest;
     public static ConfigEntry<int> SaveEnergy;
@@ -21,19 +22,23 @@ public static class SaveDataManager
     public static ConfigEntry<int> SaveGrabThrow;
     public static ConfigEntry<int> SaveHealth;
     public static ConfigEntry<int> SaveSprintSpeed;
+    public static ConfigEntry<int> SaveTumbleClimb;
     public static ConfigEntry<int> SaveTumbleLaunch;
     public static ConfigEntry<int> SaveTumbleWings;
 
     internal static void Initialize()
     {
-        ConfigFile save =
-            new ConfigFile(Path.Combine(Application.persistentDataPath, "REPOModData/RepoLeveling/save.cfg"), false);
+        ConfigFile save = new(Path.Combine(Application.persistentDataPath, "REPOModData/RepoLeveling/save.cfg"), false);
 
         SaveCumulativeHaul = save.Bind("General", "CumulativeHaul", 0,
             new ConfigDescription(
                 "The total value of all hauls you've ever completed. This value is used to calculate your available skill points. Increase this to cheat skill points. Set to 0 to reset your progress.",
                 new AcceptableValueRange<int>(0, int.MaxValue)));
 
+        SaveDeathHeadBattery = save.Bind("Skills", "DeathHeadBattery", 0,
+            new ConfigDescription(
+                "The amount of death head battery upgrades you've skilled. Set to 0 to regain spent skill points.",
+                new AcceptableValueRange<int>(0, int.MaxValue)));
         SaveMapPlayerCount = save.Bind("Skills", "MapPlayerCount", 0,
             new ConfigDescription(
                 "The amount of map player count upgrades you've skilled. Set to 0 to regain spent skill points.",
@@ -68,6 +73,10 @@ public static class SaveDataManager
             new ConfigDescription(
                 "The amount of sprint speed upgrades you've skilled. Set to 0 to regain spent skill points.",
                 new AcceptableValueRange<int>(0, int.MaxValue)));
+        SaveTumbleClimb = save.Bind("Skills", "TumbleClimb", 0,
+            new ConfigDescription(
+                "The amount of tumble climb upgrades you've skilled. Set to 0 to regain spent skill points.",
+                new AcceptableValueRange<int>(0, int.MaxValue)));
         SaveTumbleLaunch = save.Bind("Skills", "TumbleLaunch", 0,
             new ConfigDescription(
                 "The amount of tumble launch upgrades you've skilled. Set to 0 to regain spent skill points.",
@@ -81,6 +90,13 @@ public static class SaveDataManager
     public static void ResetProgress()
     {
         SaveCumulativeHaul.Value = 0;
+        ResetSkillPoints();
+        RepoLeveling.Logger.LogDebug("Progress reset.");
+    }
+
+    public static void ResetSkillPoints()
+    {
+        SaveDeathHeadBattery.Value = 0;
         SaveMapPlayerCount.Value = 0;
         SaveCrouchRest.Value = 0;
         SaveEnergy.Value = 0;
@@ -90,9 +106,10 @@ public static class SaveDataManager
         SaveGrabThrow.Value = 0;
         SaveHealth.Value = 0;
         SaveSprintSpeed.Value = 0;
+        SaveTumbleClimb.Value = 0;
         SaveTumbleLaunch.Value = 0;
         SaveTumbleWings.Value = 0;
-        RepoLeveling.Logger.LogDebug("Progress reset.");
+        RepoLeveling.Logger.LogDebug("Skill points reset.");
     }
 
     private static void ApplyUpgrade(
@@ -103,12 +120,14 @@ public static class SaveDataManager
         upgradeDict.TryAdd(PlayerController.instance.playerSteamID, 0);
 
         upgradeFunc(PlayerController.instance.playerSteamID, savedValue.Value);
- 
     }
 
     public static void ApplySkills()
     {
         RepoLeveling.Logger.LogDebug("Applying skill points...");
+
+        ApplyUpgrade(StatsManager.instance.playerUpgradeDeathHeadBattery, SaveDeathHeadBattery,
+            PunManager.instance.UpgradeDeathHeadBattery);
 
         ApplyUpgrade(StatsManager.instance.playerUpgradeMapPlayerCount, SaveMapPlayerCount,
             PunManager.instance.UpgradeMapPlayerCount);
@@ -137,6 +156,9 @@ public static class SaveDataManager
         ApplyUpgrade(StatsManager.instance.playerUpgradeSpeed, SaveSprintSpeed,
             PunManager.instance.UpgradePlayerSprintSpeed);
 
+        ApplyUpgrade(StatsManager.instance.playerUpgradeTumbleClimb, SaveTumbleClimb,
+            PunManager.instance.UpgradePlayerTumbleClimb);
+
         ApplyUpgrade(StatsManager.instance.playerUpgradeLaunch, SaveTumbleLaunch,
             PunManager.instance.UpgradePlayerTumbleLaunch);
 
@@ -163,10 +185,11 @@ public static class SaveDataManager
     /// <returns>The number of skill points spent across all available skills.</returns>
     public static int TotalSpentSkillPoints()
     {
-        int spentSkillPoints = SaveMapPlayerCount.Value + SaveCrouchRest.Value + SaveEnergy.Value +
+        int spentSkillPoints = SaveDeathHeadBattery.Value + SaveMapPlayerCount.Value + SaveCrouchRest.Value +
+                               SaveEnergy.Value +
                                SaveExtraJump.Value + SaveGrabRange.Value +
                                SaveGrabStrength.Value + SaveGrabThrow.Value + SaveHealth.Value + SaveSprintSpeed.Value +
-                               SaveTumbleLaunch.Value + SaveTumbleWings.Value;
+                               SaveTumbleClimb.Value + SaveTumbleLaunch.Value + SaveTumbleWings.Value;
         RepoLeveling.Logger.LogDebug($"Spent skill points: {spentSkillPoints}");
         return spentSkillPoints;
     }

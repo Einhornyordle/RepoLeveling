@@ -10,6 +10,8 @@ namespace RepoLeveling;
 
 public static class SkillsMenu
 {
+    private static REPOPopupPage _statisticsPage;
+    private static REPOPopupPage _skillsPage;
     private static REPOLabel _availableSkillPoints;
     private static REPOSlider[] _skillSliders;
 
@@ -25,138 +27,169 @@ public static class SkillsMenu
 
     private static void CreateSkillsMenu()
     {
+        RepoLeveling.Instance.Config.Reload();
+        ConfigManager.TotalHaulRequirementMultiplier.Value =
+            (float)Math.Round(ConfigManager.TotalHaulRequirementMultiplier.Value, 2);
         CreateStatisticsPage();
         CreateSkillsPage();
     }
 
     private static void CreateStatisticsPage()
     {
-        var statisticsPage = MenuAPI.CreateREPOPopupPage("Statistics", REPOPopupPage.PresetSide.Left, false, true);
+        _statisticsPage = MenuAPI.CreateREPOPopupPage("Statistics", REPOPopupPage.PresetSide.Left, false, true);
         REPOElement[] elements =
         {
-            MenuAPI.CreateREPOLabel("Total Hauled:", statisticsPage.transform, new Vector2(70, 270)),
-            MenuAPI.CreateREPOLabel("Next SP in:", statisticsPage.transform, new Vector2(70, 240)),
-            MenuAPI.CreateREPOLabel("Total SP earned:", statisticsPage.transform, new Vector2(70, 210)),
-            MenuAPI.CreateREPOLabel("Available SP:", statisticsPage.transform, new Vector2(70, 180)),
-            MenuAPI.CreateREPOLabel("Current Haul:", statisticsPage.transform, new Vector2(70, 150)),
+            MenuAPI.CreateREPOLabel("Total Hauled:", _statisticsPage.transform, new Vector2(70, 270)),
+            MenuAPI.CreateREPOLabel("Next SP in:", _statisticsPage.transform, new Vector2(70, 240)),
+            MenuAPI.CreateREPOLabel("Total SP earned:", _statisticsPage.transform, new Vector2(70, 210)),
+            MenuAPI.CreateREPOLabel("Available SP:", _statisticsPage.transform, new Vector2(70, 180)),
+            MenuAPI.CreateREPOLabel("Current Haul:", _statisticsPage.transform, new Vector2(70, 150)),
 
-            MenuAPI.CreateREPOLabel($"{SaveDataManager.SaveCumulativeHaul.Value}k", statisticsPage.transform,
+            MenuAPI.CreateREPOLabel($"{SaveDataManager.SaveCumulativeHaul.Value}k", _statisticsPage.transform,
                 new Vector2(260, 270)),
             MenuAPI.CreateREPOLabel($"{SaveDataManager.NeededCumulativeHaulForNextSkillPoint()}k",
-                statisticsPage.transform,
+                _statisticsPage.transform,
                 new Vector2(260, 240)),
-            MenuAPI.CreateREPOLabel($"{SaveDataManager.SkillPointsFromCumulativeHaul()}", statisticsPage.transform,
+            MenuAPI.CreateREPOLabel($"{SaveDataManager.SkillPointsFromCumulativeHaul()}", _statisticsPage.transform,
                 new Vector2(260, 210)),
             _availableSkillPoints = MenuAPI.CreateREPOLabel($"{SaveDataManager.AvailableSkillPoints()}",
-                statisticsPage.transform, new Vector2(260, 180)),
-            MenuAPI.CreateREPOLabel($"{StatsManager.instance.GetRunStatTotalHaul()}k", statisticsPage.transform,
+                _statisticsPage.transform, new Vector2(260, 180)),
+            MenuAPI.CreateREPOLabel($"{StatsManager.instance.GetRunStatTotalHaul()}k", _statisticsPage.transform,
                 new Vector2(260, 150)),
 
-            MenuAPI.CreateREPOLabel("Note: SP = Skill Points", statisticsPage.transform, new Vector2(70, 60)),
+            MenuAPI.CreateREPOLabel("Note: SP = Skill Points", _statisticsPage.transform, new Vector2(70, 60)),
             MenuAPI.CreateREPOButton("Reset progress", () => MenuAPI.OpenPopup("Reset Progress", Color.red,
                 "Are you sure that you want to reset your progress? This cannot be undone!",
                 () =>
                 {
                     SaveDataManager.ResetProgress();
-                    statisticsPage.ClosePage(true);
-                }), statisticsPage.transform, new Vector2(190, 30)),
-            MenuAPI.CreateREPOButton("Close", () => statisticsPage.ClosePage(true), statisticsPage.transform,
-                new Vector2(60, 30))
+                    _statisticsPage.ClosePage(true);
+                }), _statisticsPage.transform, new Vector2(60, 20)),
+            MenuAPI.CreateREPOButton("Close", () => _statisticsPage.ClosePage(true), _statisticsPage.transform,
+                new Vector2(280, 20))
         };
 
         foreach (REPOElement element in elements)
         {
-            statisticsPage.AddElement(element.rectTransform, element.rectTransform.localPosition);
+            _statisticsPage.AddElement(element.rectTransform, element.rectTransform.localPosition);
         }
 
-        statisticsPage.OpenPage(false);
+        _statisticsPage.OpenPage(false);
     }
 
     private static void CreateSkillsPage()
     {
         int availableSkillPoints = SaveDataManager.AvailableSkillPoints();
 
-        var skillsPage = MenuAPI.CreateREPOPopupPage("Skills", REPOPopupPage.PresetSide.Right, false, false);
+        _skillsPage = MenuAPI.CreateREPOPopupPage("Skills", REPOPopupPage.PresetSide.Right, false, false);
 
         _skillSliders = new[]
         {
+            MenuAPI.CreateREPOSlider("Death Head Battery",
+                string.Empty,
+                value => OnSkillPointAssignmentChanged(0, SaveDataManager.SaveDeathHeadBattery, value),
+                _skillsPage.transform,
+                default, 0,
+                Math.Clamp(SaveDataManager.SaveDeathHeadBattery.Value + availableSkillPoints, 0, int.MaxValue),
+                SaveDataManager.SaveDeathHeadBattery.Value),
             MenuAPI.CreateREPOSlider("Map Player Count",
                 string.Empty,
-                value => OnSkillPointAssignmentChanged(0, SaveDataManager.SaveMapPlayerCount, value),
-                skillsPage.transform,
-                new Vector2(395, 280), 0,
-                Math.Min(SaveDataManager.SaveMapPlayerCount.Value + availableSkillPoints, 1),
+                value => OnSkillPointAssignmentChanged(1, SaveDataManager.SaveMapPlayerCount, value),
+                _skillsPage.transform,
+                default, 0,
+                Math.Clamp(SaveDataManager.SaveMapPlayerCount.Value + availableSkillPoints, 0, 1),
                 SaveDataManager.SaveMapPlayerCount.Value),
             MenuAPI.CreateREPOSlider("Crouch Rest",
                 string.Empty,
-                value => OnSkillPointAssignmentChanged(1, SaveDataManager.SaveCrouchRest, value), skillsPage.transform,
-                new Vector2(395, 255), 0,
-                Math.Min(SaveDataManager.SaveCrouchRest.Value + availableSkillPoints, int.MaxValue),
+                value => OnSkillPointAssignmentChanged(2, SaveDataManager.SaveCrouchRest, value), _skillsPage.transform,
+                default, 0,
+                Math.Clamp(SaveDataManager.SaveCrouchRest.Value + availableSkillPoints, 0, int.MaxValue),
                 SaveDataManager.SaveCrouchRest.Value),
             MenuAPI.CreateREPOSlider("Stamina",
                 string.Empty,
-                value => OnSkillPointAssignmentChanged(2, SaveDataManager.SaveEnergy, value), skillsPage.transform,
-                new Vector2(395, 230), 0,
-                Math.Min(SaveDataManager.SaveEnergy.Value + availableSkillPoints, int.MaxValue),
+                value => OnSkillPointAssignmentChanged(3, SaveDataManager.SaveEnergy, value), _skillsPage.transform,
+                default, 0,
+                Math.Clamp(SaveDataManager.SaveEnergy.Value + availableSkillPoints, 0, int.MaxValue),
                 SaveDataManager.SaveEnergy.Value),
             MenuAPI.CreateREPOSlider("Double Jump",
                 string.Empty,
-                value => OnSkillPointAssignmentChanged(3, SaveDataManager.SaveExtraJump, value), skillsPage.transform,
-                new Vector2(395, 205), 0,
-                Math.Min(SaveDataManager.SaveExtraJump.Value + availableSkillPoints, int.MaxValue),
+                value => OnSkillPointAssignmentChanged(4, SaveDataManager.SaveExtraJump, value), _skillsPage.transform,
+                default, 0,
+                Math.Clamp(SaveDataManager.SaveExtraJump.Value + availableSkillPoints, 0, int.MaxValue),
                 SaveDataManager.SaveExtraJump.Value),
             MenuAPI.CreateREPOSlider("Range",
                 string.Empty,
-                value => OnSkillPointAssignmentChanged(4, SaveDataManager.SaveGrabRange, value), skillsPage.transform,
-                new Vector2(395, 180), 0,
-                Math.Min(SaveDataManager.SaveGrabRange.Value + availableSkillPoints, int.MaxValue),
+                value => OnSkillPointAssignmentChanged(5, SaveDataManager.SaveGrabRange, value), _skillsPage.transform,
+                default, 0,
+                Math.Clamp(SaveDataManager.SaveGrabRange.Value + availableSkillPoints, 0, int.MaxValue),
                 SaveDataManager.SaveGrabRange.Value),
             MenuAPI.CreateREPOSlider("Strength",
                 string.Empty,
-                value => OnSkillPointAssignmentChanged(5, SaveDataManager.SaveGrabStrength, value),
-                skillsPage.transform,
-                new Vector2(395, 155), 0,
-                Math.Min(SaveDataManager.SaveGrabStrength.Value + availableSkillPoints, int.MaxValue),
+                value => OnSkillPointAssignmentChanged(6, SaveDataManager.SaveGrabStrength, value),
+                _skillsPage.transform,
+                default, 0,
+                Math.Clamp(SaveDataManager.SaveGrabStrength.Value + availableSkillPoints, 0, int.MaxValue),
                 SaveDataManager.SaveGrabStrength.Value),
             MenuAPI.CreateREPOSlider("Throw",
                 string.Empty,
-                value => OnSkillPointAssignmentChanged(6, SaveDataManager.SaveGrabThrow, value), skillsPage.transform,
-                new Vector2(395, 130), 0,
-                Math.Min(SaveDataManager.SaveGrabThrow.Value + availableSkillPoints, int.MaxValue),
+                value => OnSkillPointAssignmentChanged(7, SaveDataManager.SaveGrabThrow, value), _skillsPage.transform,
+                default, 0,
+                Math.Clamp(SaveDataManager.SaveGrabThrow.Value + availableSkillPoints, 0, int.MaxValue),
                 SaveDataManager.SaveGrabThrow.Value),
             MenuAPI.CreateREPOSlider("Health",
                 string.Empty,
-                value => OnSkillPointAssignmentChanged(7, SaveDataManager.SaveHealth, value), skillsPage.transform,
-                new Vector2(395, 105), 0,
-                Math.Min(SaveDataManager.SaveHealth.Value + availableSkillPoints, int.MaxValue),
+                value => OnSkillPointAssignmentChanged(8, SaveDataManager.SaveHealth, value), _skillsPage.transform,
+                default, 0,
+                Math.Clamp(SaveDataManager.SaveHealth.Value + availableSkillPoints, 0, int.MaxValue),
                 SaveDataManager.SaveHealth.Value),
             MenuAPI.CreateREPOSlider("Sprint Speed",
                 string.Empty,
-                value => OnSkillPointAssignmentChanged(8, SaveDataManager.SaveSprintSpeed, value), skillsPage.transform,
-                new Vector2(395, 80), 0,
-                Math.Min(SaveDataManager.SaveSprintSpeed.Value + availableSkillPoints, int.MaxValue),
+                value => OnSkillPointAssignmentChanged(9, SaveDataManager.SaveSprintSpeed, value), _skillsPage.transform,
+                default, 0,
+                Math.Clamp(SaveDataManager.SaveSprintSpeed.Value + availableSkillPoints, 0, int.MaxValue),
                 SaveDataManager.SaveSprintSpeed.Value),
+            MenuAPI.CreateREPOSlider("Tumble Climb",
+                string.Empty,
+                value => OnSkillPointAssignmentChanged(10, SaveDataManager.SaveTumbleClimb, value),
+                _skillsPage.transform,
+                default, 0,
+                Math.Clamp(SaveDataManager.SaveTumbleClimb.Value + availableSkillPoints, 0, int.MaxValue),
+                SaveDataManager.SaveTumbleClimb.Value),
             MenuAPI.CreateREPOSlider("Tumble Launch",
                 string.Empty,
-                value => OnSkillPointAssignmentChanged(9, SaveDataManager.SaveTumbleLaunch, value),
-                skillsPage.transform,
-                new Vector2(395, 55), 0,
-                Math.Min(SaveDataManager.SaveTumbleLaunch.Value + availableSkillPoints, int.MaxValue),
+                value => OnSkillPointAssignmentChanged(11, SaveDataManager.SaveTumbleLaunch, value),
+                _skillsPage.transform,
+                default, 0,
+                Math.Clamp(SaveDataManager.SaveTumbleLaunch.Value + availableSkillPoints, 0, int.MaxValue),
                 SaveDataManager.SaveTumbleLaunch.Value),
             MenuAPI.CreateREPOSlider("Tumble Wings",
                 string.Empty,
-                value => OnSkillPointAssignmentChanged(10, SaveDataManager.SaveTumbleWings, value), skillsPage.transform,
-                new Vector2(395, 30), 0,
-                Math.Min(SaveDataManager.SaveTumbleWings.Value + availableSkillPoints, int.MaxValue),
+                value => OnSkillPointAssignmentChanged(12, SaveDataManager.SaveTumbleWings, value),
+                _skillsPage.transform,
+                default, 0,
+                Math.Clamp(SaveDataManager.SaveTumbleWings.Value + availableSkillPoints, 0, int.MaxValue),
                 SaveDataManager.SaveTumbleWings.Value)
         };
 
         foreach (REPOSlider slider in _skillSliders)
         {
-            skillsPage.AddElement(slider.rectTransform, slider.rectTransform.localPosition);
+            _skillsPage.AddElementToScrollView(slider.rectTransform);
         }
 
-        skillsPage.OpenPage(true);
+        _skillSliders[0].repoScrollViewElement.topPadding = 5;
+
+        _skillsPage.scrollView.spacing = 5;
+
+        REPOButton resetSkillPointsButton = MenuAPI.CreateREPOButton("Reset spent skill points", () =>
+            {
+                SaveDataManager.ResetSkillPoints();
+                _statisticsPage.ClosePage(true);
+            }, _skillsPage.transform,
+            new Vector2(460, 20));
+        
+        _skillsPage.AddElement(resetSkillPointsButton.rectTransform, resetSkillPointsButton.rectTransform.localPosition);
+
+        _skillsPage.OpenPage(true);
     }
 
     private static void OnSkillPointAssignmentChanged(int index, ConfigEntry<int> entry, int value)
