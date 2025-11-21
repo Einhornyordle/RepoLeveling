@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace RepoLeveling;
 
-[BepInPlugin("Einhornyordle.RepoLeveling", "RepoLeveling", "0.1.4")]
+[BepInPlugin("Einhornyordle.RepoLeveling", "RepoLeveling", "0.2.0")]
 public class RepoLeveling : BaseUnityPlugin
 {
     public static RepoLeveling Instance { get; set; } = null!;
@@ -30,6 +30,11 @@ public class RepoLeveling : BaseUnityPlugin
         SkillsMenu.Initialize();
 
         Logger.LogInfo($"{Info.Metadata.GUID} v{Info.Metadata.Version} has loaded!");
+    }
+
+    private void OnDestroy()
+    {
+        Harmony?.UnpatchSelf();
     }
 
     private void Patch()
