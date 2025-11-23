@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using BepInEx.Configuration;
 using UnityEngine;
 
@@ -112,58 +112,50 @@ public static class SaveDataManager
         RepoLeveling.Logger.LogDebug("Skill points reset.");
     }
 
-    private static void ApplyUpgrade(
-        Dictionary<string, int> upgradeDict,
-        ConfigEntry<int> savedValue,
-        Func<string, int, int> upgradeFunc)
+    public static void ApplySkills(bool force = false)
     {
-        upgradeDict.TryAdd(PlayerController.instance.playerSteamID, 0);
-
-        upgradeFunc(PlayerController.instance.playerSteamID, savedValue.Value);
-    }
-
-    public static void ApplySkills()
-    {
+        if (!force && StatsManager.instance.FetchPlayerUpgrades(PlayerAvatar.instance.steamID).Values.Any(v => v != 0)) return;
+        
         RepoLeveling.Logger.LogDebug("Applying skill points...");
+        
+        PunManager.instance.UpdateStat("playerUpgradeDeathHeadBattery", PlayerController.instance.playerSteamID,
+            SaveDeathHeadBattery.Value);
 
-        ApplyUpgrade(StatsManager.instance.playerUpgradeDeathHeadBattery, SaveDeathHeadBattery,
-            PunManager.instance.UpgradeDeathHeadBattery);
+        PunManager.instance.UpdateStat("playerUpgradeMapPlayerCount", PlayerController.instance.playerSteamID,
+            SaveMapPlayerCount.Value);
 
-        ApplyUpgrade(StatsManager.instance.playerUpgradeMapPlayerCount, SaveMapPlayerCount,
-            PunManager.instance.UpgradeMapPlayerCount);
+        PunManager.instance.UpdateStat("playerUpgradeCrouchRest", PlayerController.instance.playerSteamID,
+            SaveCrouchRest.Value);
 
-        ApplyUpgrade(StatsManager.instance.playerUpgradeCrouchRest, SaveCrouchRest,
-            PunManager.instance.UpgradePlayerCrouchRest);
+        PunManager.instance.UpdateStat("playerUpgradeStamina", PlayerController.instance.playerSteamID,
+            SaveEnergy.Value);
 
-        ApplyUpgrade(StatsManager.instance.playerUpgradeStamina, SaveEnergy,
-            PunManager.instance.UpgradePlayerEnergy);
+        PunManager.instance.UpdateStat("playerUpgradeExtraJump", PlayerController.instance.playerSteamID,
+            SaveExtraJump.Value);
 
-        ApplyUpgrade(StatsManager.instance.playerUpgradeExtraJump, SaveExtraJump,
-            PunManager.instance.UpgradePlayerExtraJump);
+        PunManager.instance.UpdateStat("playerUpgradeRange", PlayerController.instance.playerSteamID,
+            SaveGrabRange.Value);
 
-        ApplyUpgrade(StatsManager.instance.playerUpgradeRange, SaveGrabRange,
-            PunManager.instance.UpgradePlayerGrabRange);
+        PunManager.instance.UpdateStat("playerUpgradeStrength", PlayerController.instance.playerSteamID,
+            SaveGrabStrength.Value);
 
-        ApplyUpgrade(StatsManager.instance.playerUpgradeStrength, SaveGrabStrength,
-            PunManager.instance.UpgradePlayerGrabStrength);
+        PunManager.instance.UpdateStat("playerUpgradeThrow", PlayerController.instance.playerSteamID,
+            SaveGrabThrow.Value);
 
-        ApplyUpgrade(StatsManager.instance.playerUpgradeThrow, SaveGrabThrow,
-            PunManager.instance.UpgradePlayerThrowStrength);
+        PunManager.instance.UpdateStat("playerUpgradeHealth", PlayerController.instance.playerSteamID,
+            SaveHealth.Value);
 
-        ApplyUpgrade(StatsManager.instance.playerUpgradeHealth, SaveHealth,
-            PunManager.instance.UpgradePlayerHealth);
+        PunManager.instance.UpdateStat("playerUpgradeSpeed", PlayerController.instance.playerSteamID,
+            SaveSprintSpeed.Value);
 
-        ApplyUpgrade(StatsManager.instance.playerUpgradeSpeed, SaveSprintSpeed,
-            PunManager.instance.UpgradePlayerSprintSpeed);
+        PunManager.instance.UpdateStat("playerUpgradeTumbleClimb", PlayerController.instance.playerSteamID,
+            SaveTumbleClimb.Value);
 
-        ApplyUpgrade(StatsManager.instance.playerUpgradeTumbleClimb, SaveTumbleClimb,
-            PunManager.instance.UpgradePlayerTumbleClimb);
+        PunManager.instance.UpdateStat("playerUpgradeLaunch", PlayerController.instance.playerSteamID,
+            SaveTumbleLaunch.Value);
 
-        ApplyUpgrade(StatsManager.instance.playerUpgradeLaunch, SaveTumbleLaunch,
-            PunManager.instance.UpgradePlayerTumbleLaunch);
-
-        ApplyUpgrade(StatsManager.instance.playerUpgradeTumbleWings, SaveTumbleWings,
-            PunManager.instance.UpgradePlayerTumbleWings);
+        PunManager.instance.UpdateStat("playerUpgradeTumbleWings", PlayerController.instance.playerSteamID,
+            SaveTumbleWings.Value);
 
         RepoLeveling.Logger.LogDebug("Skill points applied.");
     }
