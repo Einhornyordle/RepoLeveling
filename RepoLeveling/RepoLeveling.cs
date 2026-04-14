@@ -1,11 +1,12 @@
-﻿using BepInEx;
+﻿using System.Collections.Generic;
+using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
 
 namespace RepoLeveling;
 
-[BepInPlugin("Einhornyordle.RepoLeveling", "RepoLeveling", "0.2.0")]
+[BepInPlugin("Einhornyordle.RepoLeveling", "RepoLeveling", "0.3.0")]
 public class RepoLeveling : BaseUnityPlugin
 {
     public static RepoLeveling Instance { get; set; } = null!;
@@ -14,6 +15,8 @@ public class RepoLeveling : BaseUnityPlugin
     // ReSharper disable once InconsistentNaming
     private ManualLogSource _logger => base.Logger;
     private Harmony? Harmony { get; set; }
+
+    internal Dictionary<string, Dictionary<string, int>> PlayerSkills = null!;
 
     private void Awake()
     {
@@ -25,9 +28,11 @@ public class RepoLeveling : BaseUnityPlugin
 
         Patch();
 
-        ConfigManager.Initialize();
-        SaveDataManager.Initialize();
-        SkillsMenu.Initialize();
+        PlayerSkills = new Dictionary<string, Dictionary<string, int>>();
+
+        ManagerConfig.Initialize();
+        ManagerSaveData.Initialize();
+        MenuPageMain.Initialize();
 
         Logger.LogInfo($"{Info.Metadata.GUID} v{Info.Metadata.Version} has loaded!");
     }

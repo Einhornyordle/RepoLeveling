@@ -36,3 +36,12 @@ More detailed documentation can be found via the [GitHub Wiki](https://github.co
   message [in my post in #released-mods](https://discord.com/channels/1344557689979670578/1366129264214147102). Feel
   free to ping me (@einhornyordle) there, since
   I do not actively monitor the post-thread, and it might take me a while to respond otherwise.
+
+## AI Disclosure
+
+This mod (and this description) were created with AI assistance. I am a professional developer who reviewed and manually
+verified all AI-generated content, correcting errors and ensuring quality. The AI helped speed up writing and ideation,
+but the final decisions, implementation, and testing were done by me.
+
+My view on AI: It’s not magical or flawless, nor is it useless. AI is a tool that can produce useful outputs when guided
+and vetted by experienced professionals — it doesn’t replace skilled work, it amplifies it.

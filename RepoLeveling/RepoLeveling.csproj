@@ -4,11 +4,7 @@
         <LangVersion>12</LangVersion>
         <Nullable>enable</Nullable>
         <Authors>Einhornyordle</Authors>
-
-        <!-- Version information -->
-        <Version>0.2.0</Version>
-        <AssemblyVersion>$(Version)</AssemblyVersion>
-        <FileVersion>$(Version)</FileVersion>
+        <Version>0.3.0</Version>
     </PropertyGroup>
 
     <!-- Add Package Sources -->
