@@ -1,3 +1,11 @@
+# v0.3.0
+The Massive Rewrite Update
+- Most of the mod was rewritten from scratch, which should make it easier to maintain and extend in the future
+  - This also includes visible changes like a new ui
+  - I will also close all open issues due to the rewrite most likely fixing them
+- Repo Leveling now required on the host to work at all
+  - It is still optional on clients, but only clients that have the mod installed will be able to access its features
+- Update BepInEx dependency to v5.4.2305
 # v0.2.0
 The Configuration Update
 - Added a config file

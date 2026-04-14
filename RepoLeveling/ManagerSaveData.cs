@@ -7,11 +7,15 @@ using UnityEngine;
 
 namespace RepoLeveling;
 
-public static class SaveDataManager
+internal static class ManagerSaveData
 {
-    public record SkillDefinition(string ConfigKey, string DictionaryName, string ReadableName, int MaxValue = int.MaxValue);
+    internal record SkillDefinition(
+        string ConfigKey,
+        string DictionaryName,
+        string ReadableName,
+        int MaxValue = int.MaxValue);
 
-    public static SkillDefinition[] SkillDefinitions =
+    internal static List<SkillDefinition> SkillDefinitions =
     [
         new("DeathHeadBattery", "playerUpgradeDeathHeadBattery", "death head battery"),
         new("MapPlayerCount", "playerUpgradeMapPlayerCount", "map player count", 1),
@@ -20,7 +24,6 @@ public static class SaveDataManager
         new("ExtraJump", "playerUpgradeExtraJump", "double jump"),
         new("GrabRange", "playerUpgradeRange", "range"),
         new("GrabStrength", "playerUpgradeStrength", "strength"),
-        new("GrabThrow", "playerUpgradeThrow", "throw"),
         new("Health", "playerUpgradeHealth", "health"),
         new("SprintSpeed", "playerUpgradeSpeed", "sprint speed"),
         new("TumbleClimb", "playerUpgradeTumbleClimb", "tumble climb"),
@@ -28,9 +31,9 @@ public static class SaveDataManager
         new("TumbleWings", "playerUpgradeTumbleWings", "tumble wings"),
     ];
 
-    public static ConfigEntry<int> SaveCumulativeHaul = null!;
+    internal static ConfigEntry<int> SaveCumulativeHaul = null!;
 
-    public static Dictionary<string, ConfigEntry<int>> SkillEntries = new();
+    internal static Dictionary<string, ConfigEntry<int>> SkillEntries = new();
 
     internal static void Initialize()
     {
@@ -40,6 +43,9 @@ public static class SaveDataManager
             new ConfigDescription(
                 "The total value of all hauls you've ever completed. Increase this to cheat skill points. Set to 0 to reset progress.",
                 new AcceptableValueRange<int>(0, int.MaxValue)));
+
+        if (ManagerConfig.EnableThrowSkill.Value)
+            SkillDefinitions.Add(new SkillDefinition("GrabThrow", "playerUpgradeThrow", "throw"));
 
         foreach (SkillDefinition skill in SkillDefinitions)
         {
@@ -53,7 +59,7 @@ public static class SaveDataManager
     /// <summary>
     /// Performs a factory reset of the save data.
     /// </summary>
-    public static void ResetProgress()
+    internal static void ResetProgress()
     {
         SaveCumulativeHaul.Value = 0;
         ResetSpentSkillPoints();
@@ -63,7 +69,7 @@ public static class SaveDataManager
     /// <summary>
     /// Resets spent skill points for redistribution.
     /// </summary>
-    public static void ResetSpentSkillPoints()
+    internal static void ResetSpentSkillPoints()
     {
         foreach (ConfigEntry<int> entry in SkillEntries.Values)
             entry.Value = 0;
@@ -71,34 +77,13 @@ public static class SaveDataManager
     }
 
     /// <summary>
-    /// Applies distributed skill points to the player.
-    /// </summary>
-    /// <param name="force">Skip checking if the player already has any upgrades applied.</param>
-    public static void ApplySkills(bool force = false)
-    {
-        if (!force && StatsManager.instance.FetchPlayerUpgrades(PlayerAvatar.instance.steamID).Values
-                .Any(v => v != 0)) return;
-
-        RepoLeveling.Logger.LogDebug("Applying skill points...");
-
-        foreach (SkillDefinition skill in SkillDefinitions)
-        {
-            //TODO Clients should also receive skills
-            PunManager.instance.UpdateStat(skill.DictionaryName, PlayerController.instance.playerSteamID,
-                SkillEntries[skill.ConfigKey].Value);
-        }
-
-        RepoLeveling.Logger.LogDebug("Skill points applied.");
-    }
-
-    /// <summary>
     /// Returns the total number of skill points available for the current CumulativeHaul.
     /// </summary>
     /// <returns>The total available skill points.</returns>
-    public static int SkillPointsFromCumulativeHaul()
+    internal static int SkillPointsFromCumulativeHaul()
     {
         int skillPoints = (int)Math.Round((-1 + Math.Sqrt(1 + 4 * SaveCumulativeHaul.Value /
-            (75.0f * ConfigManager.TotalHaulRequirementMultiplier.Value))) / 2);
+            (75.0f * ManagerConfig.TotalHaulRequirementMultiplier.Value))) / 2);
         RepoLeveling.Logger.LogDebug($"Total skill points: {skillPoints}");
         return skillPoints;
     }
@@ -107,7 +92,7 @@ public static class SaveDataManager
     /// Returns the number of skill points spent across all available skills.
     /// </summary>
     /// <returns>The number of skill points spent across all available skills.</returns>
-    public static int TotalSpentSkillPoints()
+    internal static int TotalSpentSkillPoints()
     {
         int spent = SkillEntries.Values.Sum(e => e.Value);
         RepoLeveling.Logger.LogDebug($"Spent skill points: {spent}");
@@ -118,7 +103,7 @@ public static class SaveDataManager
     /// Returns the number of skill points available to be spent on new skills.
     /// </summary>
     /// <returns>The number of skill points available to be spent on new skills.</returns>
-    public static int AvailableSkillPoints()
+    internal static int AvailableSkillPoints()
     {
         int availableSkillPoints = SkillPointsFromCumulativeHaul() - TotalSpentSkillPoints();
         RepoLeveling.Logger.LogDebug($"Available skill points: {availableSkillPoints}");
@@ -129,11 +114,11 @@ public static class SaveDataManager
     /// Returns the total haul required for the next skill point.
     /// </summary>
     /// <returns>The total haul required for the next skill point.</returns>
-    public static int TotalCumulativeHaulNeededForNextSkillPoint()
+    internal static int TotalCumulativeHaulNeededForNextSkillPoint()
     {
         int nextSkillPoint = SkillPointsFromCumulativeHaul() + 1;
         int neededHaul = (int)Math.Round(75 * nextSkillPoint * (nextSkillPoint + 1) *
-                                         ConfigManager.TotalHaulRequirementMultiplier.Value);
+                                         ManagerConfig.TotalHaulRequirementMultiplier.Value);
         RepoLeveling.Logger.LogDebug($"Total haul needed for next skill point: {neededHaul}");
         return neededHaul;
     }
@@ -142,7 +127,7 @@ public static class SaveDataManager
     /// Returns the haul amount still needed to gain the next skill point.
     /// </summary>
     /// <returns>The haul amount still needed to gain the next skill point</returns>
-    public static int NeededCumulativeHaulForNextSkillPoint()
+    internal static int NeededCumulativeHaulForNextSkillPoint()
     {
         int leftoverHaul = TotalCumulativeHaulNeededForNextSkillPoint() - SaveCumulativeHaul.Value;
         RepoLeveling.Logger.LogDebug($"Haul still needed for next skill point: {leftoverHaul}");
