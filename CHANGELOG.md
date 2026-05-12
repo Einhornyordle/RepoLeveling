@@ -1,3 +1,7 @@
+# v0.3.1
+- Ensured compatibility with "R.E.P.O. v0.4.0 - The Cosmetic Update" and the two patches released as of writing this
+- The Repo Leveling button in the lobby has been moved to a better position where it (hopefully) doesn't cover anything anymore
+- Update MenuLib dependency to v2.5.3
 # v0.3.0
 The Massive Rewrite Update
 - Most of the mod was rewritten from scratch, which should make it easier to maintain and extend in the future

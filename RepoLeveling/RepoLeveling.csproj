@@ -4,7 +4,7 @@
         <LangVersion>12</LangVersion>
         <Nullable>enable</Nullable>
         <Authors>Einhornyordle</Authors>
-        <Version>0.3.0</Version>
+        <Version>0.3.1</Version>
     </PropertyGroup>
 
     <!-- Add Package Sources -->
