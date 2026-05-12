@@ -8,12 +8,13 @@ internal static class MenuPageMain
 {
     internal static void Initialize()
     {
-        MenuAPI.AddElementToMainMenu(parent =>
-            MenuAPI.CreateREPOButton("Repo Leveling", Open, parent, new Vector2(50, 360)));
-        MenuAPI.AddElementToEscapeMenu(parent =>
-            MenuAPI.CreateREPOButton("Repo Leveling", Open, parent, new Vector2(50, 360)));
+        MenuAPI.BuilderDelegate button = parent =>
+            MenuAPI.CreateREPOButton("Repo Leveling", Open, parent, new Vector2(50, 360));
+
+        MenuAPI.AddElementToMainMenu(button);
+        MenuAPI.AddElementToEscapeMenu(button);
         MenuAPI.AddElementToLobbyMenu(parent =>
-            MenuAPI.CreateREPOButton("Repo Leveling", Open, parent, new Vector2(50, 360)));
+            MenuAPI.CreateREPOButton("Repo Leveling", Open, parent, new Vector2(30, 295)));
     }
 
     internal static void Open()
