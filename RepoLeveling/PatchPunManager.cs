@@ -9,7 +9,7 @@ namespace RepoLeveling;
 [HarmonyPatch(typeof(PunManager))]
 internal static class PatchPunManager
 {
-    [HarmonyPrefix, HarmonyPatch(nameof(PunManager.SyncAllDictionaries))]
+    [HarmonyPrefix, HarmonyPatch(nameof(PunManager.SyncAllDictionaries), typeof(bool))]
     private static void SyncAllDictionaries_Prefix()
     {
         if (!SemiFunc.IsMasterClientOrSingleplayer() || !SemiFunc.RunIsLevel()) return;
