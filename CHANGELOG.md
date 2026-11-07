@@ -1,3 +1,6 @@
+# v0.3.2
+- Ensured compatibility with "R.E.P.O. v0.5.0 - The Sunstone Update"
+- Update MenuLib dependency to v2.6.2
 # v0.3.1
 - Ensured compatibility with "R.E.P.O. v0.4.0 - The Cosmetic Update" and the two patches released as of writing this
 - The Repo Leveling button in the lobby has been moved to a better position where it (hopefully) doesn't cover anything anymore

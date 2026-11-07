@@ -4,7 +4,7 @@
         <LangVersion>12</LangVersion>
         <Nullable>enable</Nullable>
         <Authors>Einhornyordle</Authors>
-        <Version>0.3.1</Version>
+        <Version>0.3.2</Version>
     </PropertyGroup>
 
     <!-- Add Package Sources -->
@@ -31,6 +31,6 @@
         <PackageReference Include="R.E.P.O.GameLibs.Steam" Version="*-*" PrivateAssets="all" Publicize="true"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Nickklmao-MenuLib" Version="*" />
+        <PackageReference Include="REPOModding-MenuLib" Version="*" />
     </ItemGroup>
 </Project>
