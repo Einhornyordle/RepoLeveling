@@ -21,4 +21,4 @@ body:
     id: reality
     attributes:
       label: Additional context
-      description: "Add any other context about the problem here."
+      description: "Add any other context about the suggestion here."
